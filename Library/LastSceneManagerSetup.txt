@@ -1,0 +1,7 @@
+sceneSetups:
+- path: Assets/TBS Framework/Scenes/Room Test.unity
+  isLoaded: 1
+  isActive: 1
+- path: Assets/TBS Framework/Scenes/Room 1.unity
+  isLoaded: 0
+  isActive: 0
