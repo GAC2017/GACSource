@@ -82,6 +82,11 @@ public class CellGrid : MonoBehaviour
             {
                 unit.UnitClicked += OnUnitClicked;
                 unit.UnitDestroyed += OnUnitDestroyed;
+
+				if (unit.PlayerNumber == 0) 
+				{
+					unit.UnitMoved += OnSolePlayerUnitMoved;
+				}
             }
         }
         else
@@ -117,6 +122,10 @@ public class CellGrid : MonoBehaviour
                 GameEnded.Invoke(this, new EventArgs());
         }
     }
+	private void OnSolePlayerUnitMoved(object sender, MovementEventArgs e)
+	{
+		this.EndTurn ();
+	}
     
     /// <summary>
     /// Method is called once, at the beggining of the game.

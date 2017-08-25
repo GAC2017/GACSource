@@ -109,6 +109,6 @@ public class NaiveAiPlayer : Player
                 }
             }//Look for enemies in range and attack.
         }    
-        _cellGrid.EndTurn();     
+        _cellGrid.EndTurn();
     }
 }
