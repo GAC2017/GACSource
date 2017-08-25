@@ -35,7 +35,7 @@ public class CustomUnitGenerator : MonoBehaviour, IUnitGenerator
             }
             else
             {
-                //Debug.LogError("Invalid object in Units Parent game object");
+                Debug.LogError("Invalid object in Units Parent game object");
             }
             
         }
