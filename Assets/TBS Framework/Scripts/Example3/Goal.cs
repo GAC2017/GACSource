@@ -10,10 +10,12 @@ public class Goal : MonoBehaviour {
         if (other.gameObject.CompareTag("Lumberman"))
         {
             control.NextLevel();
+            Debug.Log("go");
         }
         else if (other.gameObject.CompareTag("Soldier"))
         {
             control.NextLevel();
+            Debug.Log("go");
         }
     }
 }
