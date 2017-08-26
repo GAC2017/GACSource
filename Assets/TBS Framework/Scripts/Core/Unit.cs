@@ -7,7 +7,7 @@ using System.Collections;
 /// <summary>
 /// Base class for all units in the game.
 /// </summary>
-public abstract class Unit : MonoBehaviour
+public abstract class Unit : MonoBehaviour, IAttackCapable
 {
     /// <summary>
     /// UnitClicked event is invoked when user clicks the unit. It requires a collider on the unit game object to work.
@@ -92,7 +92,12 @@ public abstract class Unit : MonoBehaviour
         TotalActionPoints = ActionPoints;
     }
 
-  
+	public int FreezeDuration { get; set;}
+	public void Freeze(int numberOfTurns)
+	{
+		MovementPoints = 0;
+		FreezeDuration = numberOfTurns;
+	}
 
     protected virtual void OnMouseDown()
     {
@@ -115,7 +120,16 @@ public abstract class Unit : MonoBehaviour
     /// </summary>
     public virtual void OnTurnStart()
     {
-        MovementPoints = TotalMovementPoints;
+		if (FreezeDuration == 0) 
+		{
+			MovementPoints = TotalMovementPoints;
+		} 
+		else 
+		{
+			MovementPoints = 0;
+			FreezeDuration = FreezeDuration - 1;
+		}
+
         ActionPoints = TotalActionPoints;
 
         SetState(new UnitStateMarkedAsFriendly(this));
@@ -138,7 +152,7 @@ public abstract class Unit : MonoBehaviour
     {
         Cell.IsTaken = false;
         MarkAsDestroyed();
-        Destroy(gameObject);
+		Destroy (gameObject);
     }
 
     /// <summary>
@@ -170,6 +184,19 @@ public abstract class Unit : MonoBehaviour
 
         return false;
     }
+
+	//Similar to IsUnitAttackable, this method check for trigger instead
+	//note that this method allows for the possibility of a trigger being activate
+	//from a long distance away
+	public virtual bool IsUnitAffectedByTrigger(Trigger trigger)
+	{
+		int distance = this.Cell.GetDistance (trigger.Cell);
+		if (distance <= trigger.EffectRange)
+			return true;
+
+		return false;
+	}
+
     /// <summary>
     /// Method deals damage to unit given as parameter.
     /// </summary>
@@ -192,10 +219,17 @@ public abstract class Unit : MonoBehaviour
             MovementPoints = 0;
         }  
     }
+
+	//Allowing the unit to be damaged and defend itself if possible.
+	public virtual void GetDamaged(IAttackCapable attacker, int damage)
+	{
+		Defend(attacker, damage);
+	}
+
     /// <summary>
     /// Attacking unit calls Defend method on defending unit. 
     /// </summary>
-    protected virtual void Defend(Unit other, int damage)
+    protected virtual void Defend(IAttackCapable other, int damage)
     {
         MarkAsDefending(other);
         HitPoints -= Mathf.Clamp(damage - DefenceFactor, 1, damage);  //Damage is calculated by subtracting attack factor of attacker and defence factor of defender. If result is below 1, it is set to 1.
@@ -211,6 +245,22 @@ public abstract class Unit : MonoBehaviour
         }
     }
 
+	//return true if the unit is dead after this
+	public bool ApplyTriggerEffectAndCheckDead(Trigger trigger)
+	{
+		trigger.ApplyEffectOnActivation (this);
+
+		if (HitPoints <= 0)
+		{
+			if (UnitDestroyed != null)
+				UnitDestroyed.Invoke(this, new AttackEventArgs(trigger, this, trigger.Damage));
+			OnDestroyed();
+
+			return true;
+		}
+
+		return false;
+	}
     
     public virtual void Move(Cell destinationCell, List<Cell> path)
     {
@@ -317,7 +367,7 @@ public abstract class Unit : MonoBehaviour
     /// Gives visual indication that the unit is under attack.
     /// </summary>
     /// <param name="other"></param>
-    public abstract void MarkAsDefending(Unit other);
+    public abstract void MarkAsDefending(IAttackCapable other);
     /// <summary>
     /// Gives visual indication that the unit is attacking.
     /// </summary>
@@ -366,12 +416,12 @@ public class MovementEventArgs : EventArgs
 }
 public class AttackEventArgs : EventArgs
 {
-    public Unit Attacker;
-    public Unit Defender;
+    public IAttackCapable Attacker;
+    public IAttackCapable Defender;
 
     public int Damage;
 
-    public AttackEventArgs(Unit attacker, Unit defender, int damage)
+    public AttackEventArgs(IAttackCapable attacker, IAttackCapable defender, int damage)
     {
         Attacker = attacker;
         Defender = defender;

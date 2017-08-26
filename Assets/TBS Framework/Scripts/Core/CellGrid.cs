@@ -42,6 +42,7 @@ public class CellGrid : MonoBehaviour
     public List<Player> Players { get; private set; }
     public List<Cell> Cells { get; private set; }
     public List<Unit> Units { get; private set; }
+	public List<Trigger> Triggers { get; private set; }
 
     void Start()
     {
@@ -88,6 +89,8 @@ public class CellGrid : MonoBehaviour
 					unit.UnitMoved += OnSolePlayerUnitMoved;
 				}
             }
+
+			Triggers = unitGenerator.SpawnTriggers (Cells);
         }
         else
             Debug.LogError("No IUnitGenerator script attached to cell grid");
@@ -112,15 +115,31 @@ public class CellGrid : MonoBehaviour
     {
         CellGridState.OnUnitClicked(sender as Unit);
     }
+
+	private IEnumerable<Unit> GetUnitsOfATeam(int playerNumber)
+	{
+		return from unit in Units
+		       where unit.PlayerNumber == playerNumber
+		       select unit;
+	}
+
     private void OnUnitDestroyed(object sender, AttackEventArgs e)
     {
-        Units.Remove(sender as Unit);
-        var totalPlayersAlive = Units.Select(u => u.PlayerNumber).Distinct().ToList(); //Checking if the game is over
-        if (totalPlayersAlive.Count == 1)
-        {
-            if(GameEnded != null)
-                GameEnded.Invoke(this, new EventArgs());
-        }
+        Units.Remove(sender as Unit); 
+        //var totalPlayersAlive = Units.Select(u => u.PlayerNumber).Distinct().ToList(); //Checking if the game is over
+//        if (totalPlayersAlive.Count == 1)
+//        {
+//            if(GameEnded != null)
+//                GameEnded.Invoke(this, new EventArgs());
+//        }
+
+		bool playerIsDead = GetUnitsOfATeam (0).Count() == 0;
+
+		if (playerIsDead) 
+		{
+			if(GameEnded != null)
+				GameEnded.Invoke(this, new EventArgs());
+		}
     }
 	private void OnSolePlayerUnitMoved(object sender, MovementEventArgs e)
 	{
@@ -143,19 +162,24 @@ public class CellGrid : MonoBehaviour
     /// </summary>
     public void EndTurn()
     {
-        if (Units.Select(u => u.PlayerNumber).Distinct().Count() == 1)
-        {
-            return;
-        }
+//        if (Units.Select(u => u.PlayerNumber).Distinct().Count() == 1)
+//        {
+//            return;
+//        }
         CellGridState = new CellGridStateTurnChanging(this);
 
-        Units.FindAll(u => u.PlayerNumber.Equals(CurrentPlayerNumber)).ForEach(u => { u.OnTurnEnd(); });
+		bool playerDefeated = GetUnitsOfATeam (CurrentPlayerNumber).Count() == 0;
+
+		//End the turn for all units of this current player
+		if (!playerDefeated)
+        	Units.FindAll(u => u.PlayerNumber.Equals(CurrentPlayerNumber)).ForEach(u => { u.OnTurnEnd(); });
 
         CurrentPlayerNumber = (CurrentPlayerNumber + 1) % NumberOfPlayers;
-        while (Units.FindAll(u => u.PlayerNumber.Equals(CurrentPlayerNumber)).Count == 0)
+		bool currentPlayerDefeated = GetUnitsOfATeam (CurrentPlayerNumber).Count () == 0;
+        while (currentPlayerDefeated)
         {
             CurrentPlayerNumber = (CurrentPlayerNumber + 1)%NumberOfPlayers;
-        }//Skipping players that are defeated.
+        }//Skipping players that are defeated until finding the next player
 
         if (TurnEnded != null)
             TurnEnded.Invoke(this, new EventArgs());

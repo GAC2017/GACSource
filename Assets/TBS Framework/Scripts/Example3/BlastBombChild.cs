@@ -2,31 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlastBombChild : MonoBehaviour {
-    int Time = 20;
+//Too complicated: not used for now
+public class BlastBombChild : Trigger {
+    private int _time = 20000;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Lumberman"))
-        {
-            other.gameObject.SetActive(false);
-        }
-        if (other.gameObject.CompareTag("Soldier"))
-        {
-            other.gameObject.SetActive(false);
-        }
+		//other.gameObject.
     }
 
     private void LateUpdate()
     {
-        Time = Time - 1;
-        if(Time == 0)
+		_time = _time - 1;
+		if(_time == 0)
         {
            
             gameObject.SetActive(false);
       
         }
-            
-
     }
+
+	//Attempting to insta-kill, vastly exceeding defence factor
+	public override void ApplyEffectOnActivation (Unit target)
+	{
+		target.GetDamaged (this, target.HitPoints * 1000);
+	}
 }

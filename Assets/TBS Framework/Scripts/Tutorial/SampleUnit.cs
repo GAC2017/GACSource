@@ -13,13 +13,13 @@ public class SampleUnit : Unit
     {      
     }
 
-    public override void MarkAsDefending(Unit other)
+    public override void MarkAsDefending(IAttackCapable other)
     {       
     }
 
     public override void MarkAsDestroyed()
     {      
-    }
+	}
 
     public override void MarkAsFinished()
     {
