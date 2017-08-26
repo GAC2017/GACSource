@@ -24,7 +24,7 @@ public class GenericUnit : Unit
     {
         StartCoroutine(Jerk(other));
     }
-    public override void MarkAsDefending(Unit other)
+    public override void MarkAsDefending(IAttackCapable other)
     {
         StartCoroutine(Glow(new Color(1, 0, 0, 0.5f), 1));
     }

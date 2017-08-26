@@ -27,9 +27,9 @@ public class NaiveAiPlayer : Player
     private IEnumerator Play()
     {
         var myUnits = _cellGrid.Units.FindAll(u => u.PlayerNumber.Equals(PlayerNumber)).ToList();
+		var enemyUnits = _cellGrid.Units.Except(myUnits).ToList();
         foreach (var unit in myUnits.OrderByDescending(u => u.Cell.GetNeighbours(_cellGrid.Cells).FindAll(u.IsCellTraversable).Count))
         {
-            var enemyUnits = _cellGrid.Units.Except(myUnits).ToList();
             var unitsInRange = new List<Unit>();
             foreach (var enemyUnit in enemyUnits)
             {
@@ -108,7 +108,31 @@ public class NaiveAiPlayer : Player
                     break;
                 }
             }//Look for enemies in range and attack.
-        }    
+        }
+
+		//Check triggers and see if any is activated and apply the effect
+		foreach (Trigger trigger in _cellGrid.Triggers) 
+		{
+			for (int i = 0; i < _cellGrid.Units.Count; i++) 
+			{
+				Unit target = _cellGrid.Units [i];
+
+				if (target.PlayerNumber == 0)
+					continue; //skip over the human player
+
+				if (target.IsUnitAffectedByTrigger (trigger)) 
+				{
+					bool isTargetDead = target.ApplyTriggerEffectAndCheckDead(trigger);
+
+					//TODO: enemy units cannot all die at the moment, or Unity will crash :(
+					if (isTargetDead) {
+						_cellGrid.Units.RemoveAt (i);
+						i--;
+					}
+				}
+			}
+		}
+
         _cellGrid.EndTurn();
     }
 }

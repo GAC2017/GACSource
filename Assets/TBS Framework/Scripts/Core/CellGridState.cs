@@ -25,10 +25,10 @@ public abstract class CellGridState
 
     public virtual void OnStateEnter()
     {
-        if (_cellGrid.Units.Select(u => u.PlayerNumber).Distinct().ToList().Count == 1)
-        {
-            _cellGrid.CellGridState = new CellGridStateGameOver(_cellGrid);
-        }
+//        if (_cellGrid.Units.Select(u => u.PlayerNumber).Distinct().ToList().Count == 1)
+//        {
+//            _cellGrid.CellGridState = new CellGridStateGameOver(_cellGrid);
+//        }
     }
     public virtual void OnStateExit()
     {

@@ -12,6 +12,10 @@ class RandomUnitGenerator : MonoBehaviour, IUnitGenerator
     public int NumberOfPlayers;
     public int UnitsPerPlayer;
 
+	public List<Trigger> SpawnTriggers(List<Cell> cells){
+		return new List<Trigger>();
+	}
+
     public List<Unit> SpawnUnits(List<Cell> cells)
     {
         List<Unit> ret = new List<Unit>();

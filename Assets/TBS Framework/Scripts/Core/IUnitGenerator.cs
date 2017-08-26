@@ -2,6 +2,7 @@
 
 public interface IUnitGenerator
 {
-     List<Unit> SpawnUnits(List<Cell> cells);
+    List<Unit> SpawnUnits(List<Cell> cells);
+	List<Trigger> SpawnTriggers(List<Cell> cells);
 }
 

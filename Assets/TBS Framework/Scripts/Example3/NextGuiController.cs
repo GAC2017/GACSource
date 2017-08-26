@@ -42,8 +42,9 @@ public class NextGuiController : MonoBehaviour
     private void OnGameEnded(object sender, EventArgs e)
     {
         _gameOverPanel = Instantiate(GameOverPanel);
-        _gameOverPanel.transform.Find("InfoText").GetComponent<Text>().text = "Player " + ((sender as CellGrid).CurrentPlayerNumber + 1) + "\nwins!";
+        //_gameOverPanel.transform.Find("InfoText").GetComponent<Text>().text = "Player " + ((sender as CellGrid).CurrentPlayerNumber + 1) + "\nwins!";
 
+		_gameOverPanel.transform.Find("InfoText").GetComponent<Text>().text = "Is this the end?";
         _gameOverPanel.transform.Find("DismissButton").GetComponent<Button>().onClick.AddListener(DismissPanel);
 
         _gameOverPanel.GetComponent<RectTransform>().SetParent(Canvas.GetComponent<RectTransform>(), false);
@@ -70,43 +71,33 @@ public class NextGuiController : MonoBehaviour
     }
     private void OnUnitHighlighted(object sender, EventArgs e)
     {
-        var unit = sender as GenericUnit;
-        _infoPanel = Instantiate(InfoPanel);
-
-        float hpScale = (float)((float)(unit).HitPoints / (float)(unit).TotalHitPoints);
-
-        _infoPanel.transform.Find("Name").GetComponent<Text>().text = unit.UnitName;
-        _infoPanel.transform.Find("HitPoints").Find("Image").transform.localScale = new Vector3(hpScale, 1, 1);
-        _infoPanel.transform.Find("Attack").Find("Image").transform.localScale = new Vector3((float)unit.AttackFactor / 10.0f, 1, 1);
-        _infoPanel.transform.Find("Defence").Find("Image").transform.localScale = new Vector3((float)unit.DefenceFactor / 10.0f, 1, 1);
-
-        _infoPanel.GetComponent<RectTransform>().SetParent(Canvas.GetComponent<RectTransform>(), false);
+//        var unit = sender as GenericUnit;
+//        _infoPanel = Instantiate(InfoPanel);
+//
+//        float hpScale = (float)((float)(unit).HitPoints / (float)(unit).TotalHitPoints);
+//
+//        _infoPanel.transform.Find("Name").GetComponent<Text>().text = unit.UnitName;
+//        _infoPanel.transform.Find("HitPoints").Find("Image").transform.localScale = new Vector3(hpScale, 1, 1);
+//        _infoPanel.transform.Find("Attack").Find("Image").transform.localScale = new Vector3((float)unit.AttackFactor / 10.0f, 1, 1);
+//        _infoPanel.transform.Find("Defence").Find("Image").transform.localScale = new Vector3((float)unit.DefenceFactor / 10.0f, 1, 1);
+//
+//        _infoPanel.GetComponent<RectTransform>().SetParent(Canvas.GetComponent<RectTransform>(), false);
     }
 
     public void DismissPanel()
     {
         Destroy(_gameOverPanel);
+		RestartLevel ();
     }
-    public void RestartLevel()
-    {
-        Application.LoadLevel(Application.loadedLevel);
-    }
-    public void NextLevel()
-    {
-        
-        switch (SceneManager.GetActiveScene().buildIndex)
-        {
-            //If scene 0, then move to scene 1
-            case 0:
-                SceneManager.LoadScene(1);
-                break;
-            case 1: //If scene 1, then move to scene 2
-                SceneManager.LoadScene(2);
-                break;
-            default: //Otherwise just reload the current level
-                Application.LoadLevel(Application.loadedLevel);
-                break;
-        }
-    }
+		
+	public void RestartLevel()
+	{
+		SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex);
+	}
+		
+	public void NextLevel(string sceneName)
+	{
+		SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+	}
 }
 

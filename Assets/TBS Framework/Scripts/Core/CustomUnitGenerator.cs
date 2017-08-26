@@ -7,6 +7,7 @@ public class CustomUnitGenerator : MonoBehaviour, IUnitGenerator
 {
     public Transform UnitsParent;
     public Transform CellsParent;
+	public Transform TriggersParent;
 
     /// <summary>
     /// Returns units that are already children of UnitsParent object.
@@ -41,6 +42,41 @@ public class CustomUnitGenerator : MonoBehaviour, IUnitGenerator
         }
         return ret;
     }
+
+	/// <summary>
+	/// Returns trigger that are already children of TriggersParent object.
+	/// To be called by CellGrid.
+	/// </summary>
+	public List<Trigger> SpawnTriggers(List<Cell> cells)
+	{
+		List<Trigger> ret = new List<Trigger>();
+		for (int i = 0; i < TriggersParent.childCount; i++)
+		{
+			var trigger = TriggersParent.GetChild(i).GetComponent<Trigger>();
+			if(trigger !=null)
+			{
+				var cell = cells.OrderBy(h => Math.Abs((h.transform.position - trigger.transform.position).magnitude)).First();
+				if (!cell.IsTaken)
+				{
+					cell.IsTaken = false;//SUPER IMPORTANT: THIS ALLOWS UNITS TO STEP INTO THE TRIGGER!!!
+					trigger.Cell = cell;
+					trigger.transform.position = cell.transform.position;
+					trigger.Initialize();
+					ret.Add(trigger);
+				}//Trigger gets snapped to the nearest cell
+				else
+				{
+					Destroy(trigger.gameObject);
+				}//If the nearest cell is taken, the unit gets destroyed.
+			}
+			else
+			{
+				Debug.LogError("Invalid object in Triggers Parent game object");
+			}
+
+		}
+		return ret;
+	}
 
     public void SnapToGrid()
     {
