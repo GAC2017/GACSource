@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/TBS Framework/Scenes/Room 1.unity
+- path: Assets/TBS Framework/Scenes/Thomas 1.unity
   isLoaded: 1
   isActive: 1
