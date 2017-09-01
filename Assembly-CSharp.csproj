@@ -95,6 +95,7 @@
      <Compile Include="Assets\TBS Framework\Scripts\Example3\BlastBomb.cs" />
      <Compile Include="Assets\TBS Framework\Scripts\Example3\BlastBombChild.cs" />
      <Compile Include="Assets\TBS Framework\Scripts\Example3\DeathTrap.cs" />
+     <Compile Include="Assets\TBS Framework\Scripts\Example3\DoorTrigger.cs" />
      <Compile Include="Assets\TBS Framework\Scripts\Example3\GenericUnit.cs" />
      <Compile Include="Assets\TBS Framework\Scripts\Example3\IAttackCapable.cs" />
      <Compile Include="Assets\TBS Framework\Scripts\Example3\MySquare.cs" />
